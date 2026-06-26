@@ -44,7 +44,7 @@
                     <table class="table align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th style="font-size:12px;" class="px-4">Component</th>
+                                <th style="font-size:12px;" class="text-center">Component</th>
                                 <th style="font-size:12px;" class="text-center">Expected Qty</th>
                                 <th style="font-size:12px;" class="text-center">Actual Qty</th>
                                 <th style="font-size:12px;" class="text-center">Short Qty</th>
