@@ -19,8 +19,8 @@
                             <th style="font-size:12px;">Model</th>
                             <th style="font-size:12px;">Inspector</th>
                             <th style="font-size:12px;">Inspected At</th>
-                            <th style="font-size:12px;">Status</th>
                             <th style="font-size:12px;">VIN</th>
+                            <th style="font-size:12px;">Status</th>
                             <th style="font-size:12px;">Action</th>
                         </tr>
                     </thead>

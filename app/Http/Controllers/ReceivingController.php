@@ -50,6 +50,8 @@ class ReceivingController extends Controller
                 'inspection_no' => Inspection::generateNo(),
                 'receiving_id'  => $receiving->id,
                 'status'        => Inspection::STATUS_OPEN,
+                'inspector_id'  => session('user.id'),
+                'inspected_at' => now(),
             ]);
 
             // Create one InspectionItem per component (snapshot)
