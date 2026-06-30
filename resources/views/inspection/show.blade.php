@@ -64,10 +64,12 @@
                         <tbody>
                             @foreach ($items as $item)
                                 <tr class="item-row" data-id="{{ $item->id }}">
-                                    <td class="px-4 fw-semibold" style="font-size:13px;">
+                                    <td class="px-4 fw-semibold"
+                                        style="font-size:13px; white-space: normal; word-break: break-word; overflow-wrap: anywhere; max-width: 220px;">
                                         {{ $item->component_name }}
-                                        <small class="text-muted d-block"
-                                            style="font-size:11px;">{{ $item->component_code }}</small>
+                                        <small class="text-muted d-block" style="font-size:11px;">
+                                            {{ $item->component_code }}
+                                        </small>
                                     </td>
 
                                     <td class="text-center" style="font-size:13px;">{{ $item->expected_qty }}</td>
