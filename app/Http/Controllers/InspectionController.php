@@ -11,14 +11,27 @@ class InspectionController extends Controller
 {
     public function index()
     {
-        $query = Inspection::with(['receiving.ckdModel', 'inspector'])->latest();
+        $query = Inspection::query()
+    ->select('inspections.*')
+    ->join('receivings', 'receivings.id', '=', 'inspections.receiving_id')
+    ->with(['receiving.ckdModel', 'inspector']);
 
         // Inspector only sees their own workload (OPEN / WAITING_APPROVAL)
         if (session('user.role') === 'inspector') {
             $query->whereIn('status', [Inspection::STATUS_OPEN, Inspection::STATUS_WAITING_APPROVAL]);
         }
 
-        $inspections = $query->get();
+        $inspections =$query->when(request('search'), function ($query, $search) {
+            $search = strtolower($search);
+            $query->whereHas('receiving', function ($q) use ($search) {
+                $q->whereRaw('LOWER(container_no) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(receiving_no) LIKE ?', ["%{$search}%"]);
+            });
+        })
+        ->orderByDesc('inspections.created_at')
+        ->orderByDesc('receivings.container_no')
+        ->paginate(10)
+        ->withQueryString();
 
         return view('inspection.index', compact('inspections'));
     }

@@ -25,11 +25,23 @@
                             </label>
                             <input type="text" name="container_no"
                                 class="form-control @error('container_no') is-invalid @enderror"
-                                value="{{ old('container_no') }}" placeholder="Contoh: CONT-2024-001" required>
+                                value="{{ old('container_no') }}" placeholder="Contoh: TCNU1234567" required>
                             @error('container_no')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Total Receiving <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" name="total_receiving" min="1"
+                                class="form-control @error('total_receiving') is-invalid @enderror"
+                                value="{{ old('total_receiving') }}" placeholder="Total barang yang diterima " required>
+                            @error('total_receiving')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold">

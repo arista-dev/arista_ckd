@@ -52,7 +52,7 @@
                             <label class="form-label fw-semibold">Status Model</label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" name="is_active"
-                                    id="is_active" value="1"
+                                    id="is_active" value="1" disabled
                                     {{ old('is_active', $master->is_active) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_active">Model Aktif</label>
                             </div>
@@ -64,18 +64,18 @@
                 </div>
 
                 {{-- Submit button stays INSIDE the form, right after the card --}}
-                <div class="mt-4 d-flex gap-2">
+                {{-- <div class="mt-4 d-flex gap-2">
                     <button type="submit" class="btn btn-dark px-4">
                         <i class="bi bi-save me-1"></i> Simpan Perubahan
                     </button>
                     <a href="{{ route('master.show', $master) }}" class="btn btn-outline-secondary px-4">
                         Batal
                     </a>
-                </div>
+                </div> --}}
 
             </form>
             {{-- Danger zone --}}
-            @if ($master->receivings()->count() === 0)
+            {{-- @if ($master->receivings()->count() === 0)
                 <div class="card border-danger border-opacity-50 shadow-sm mt-3">
                     <div class="card-body">
                         <p class="fw-semibold text-danger mb-2" style="font-size:13px;">
@@ -93,7 +93,7 @@
                         </form>
                     </div>
                 </div>
-            @endif
+            @endif --}}
         </div>
 
         {{-- Right: Components --}}
@@ -131,9 +131,8 @@
                             @foreach ($components as $comp)
                                 @php $hasHistory = $comp->inspectionItems()->exists(); @endphp
                                 <tr class="comp-row" data-id="{{ $comp->id }}">
-                                    <td class="px-3">
-                                        <input type="text"
-                                            class="form-control form-control-sm text-uppercase field-code"
+                                    <td class="align-middle px-3" style="width: 15%;">
+                                        <input type="text" class="form-control form-control-sm text-uppercase field-code"
                                             value="{{ $comp->code }}" maxlength="20"
                                             {{ $hasHistory ? 'readonly' : '' }}>
                                         @if ($hasHistory)
@@ -142,32 +141,44 @@
                                             </small>
                                         @endif
                                     </td>
-                                    <td>
+
+                                    <td class="align-middle">
                                         <input type="text" class="form-control form-control-sm field-name"
                                             value="{{ $comp->name }}" maxlength="100">
+                                        @if ($comp->description)
+                                            <small class="text-muted d-block mt-1" style="font-size:10px;">
+                                                <i class="bi bi-info-circle"></i> {{ $comp->description }}
+                                            </small>
+                                        @endif
                                     </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm text-center field-qty"
-                                            value="{{ $comp->expected_qty }}" min="1">
+
+                                    <td class="align-middle text-center" style="width: 12%;">
+                                        <input type="number"
+                                            class="form-control form-control-sm text-center field-qty mx-auto"
+                                            value="{{ $comp->expected_qty }}" min="1" style="max-width: 80px;">
                                     </td>
-                                    <td class="text-center">
+
+                                    <td class="align-middle text-center" style="width: 10%;">
                                         @if ($hasHistory)
                                             <span class="badge bg-info"><i class="bi bi-clock-history"></i></span>
                                         @else
                                             <span class="text-muted" style="font-size:11px;">—</span>
                                         @endif
                                     </td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-success save-row"
-                                            title="Simpan">
-                                            <i class="bi bi-check-lg save-icon"></i>
-                                        </button>
-                                        @if (!$hasHistory)
-                                            <button type="button" class="btn btn-sm btn-outline-danger remove-row"
-                                                title="Hapus">
-                                                <i class="bi bi-trash"></i>
+
+                                    <td class="align-middle text-center" style="width: 15%;">
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <button type="button" class="btn btn-sm btn-outline-success save-row"
+                                                title="Simpan">
+                                                <i class="bi bi-check-lg save-icon"></i>
                                             </button>
-                                        @endif
+                                            @if (!$hasHistory)
+                                                <button type="button" class="btn btn-sm btn-outline-danger remove-row"
+                                                    title="Hapus">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

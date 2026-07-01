@@ -2,10 +2,20 @@
 @section('page-title', 'Inspection')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h5 class="fw-bold mb-1">Inspection</h5>
-            <p class="text-muted mb-0" style="font-size:13px;">Daftar inspection CKD Kit</p>
+    <div class="card-header d-flex justify-content-between align-items-center mb-4">
+        <div class ="py-3 d-flex justify-content-between align-items-center w-100">
+            <div class="div">
+                <h5 class="fw-bold mb-1">Inspection</h5>
+                <p class="text-muted mb-0" style="font-size:13px;">Daftar inspection CKD Kit</p>
+            </div>
+
+            <form method="GET" action="{{ route('inspection.index') }}" id="searchForm">
+                <div class="input-group input-group-sm" style="width: 250px;">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" id="searchComponent" class="form-control border-start-0 ps-0"
+                        placeholder="Cari Container/Receiving..." value="{{ request('search') }}">
+                </div>
+            </form>
         </div>
     </div>
 
@@ -16,7 +26,8 @@
                     <thead class="table-light">
                         <tr>
                             <th style="font-size:12px;">Inspection No</th>
-                            <th style="font-size:12px;">Receiving No</th>
+                            {{-- <th style="font-size:12px; width: 150px;">Container No</th> --}}
+                            <th style="font-size:12px;">Cont / Receiving No</th>
                             <th style="font-size:12px;">Model</th>
                             <th style="font-size:12px;">Inspector</th>
                             <th style="font-size:12px;">Inspected At</th>
@@ -31,9 +42,11 @@
                                 <td class="fw-semibold">
                                     {{ $ins->inspection_no }}
                                 </td>
-
+                                {{-- <td class ="">
+                                    {{ $ins->receiving->container_no }}
+                                </td> --}}
                                 <td>
-                                    {{ $ins->receiving->receiving_no }}
+                                    {{ $ins->receiving->container_no ?? '-' }} / {{ $ins->receiving->receiving_no }}
                                 </td>
 
                                 <td>
@@ -76,7 +89,19 @@
                         @endforelse
                     </tbody>
                 </table>
+                <div class="card-footer bg-white d-flex justify-content-center py-3">
+                    {{ $inspections->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        document.getElementById('searchComponent').addEventListener('input', function() {
+            document.getElementById('searchForm').submit();
+        });
+    </script>
+
 @endsection

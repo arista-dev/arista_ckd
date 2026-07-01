@@ -9,6 +9,8 @@
         <div>
             <h5 class="fw-bold mb-0">{{ $inspection->inspection_no }}</h5>
             <p class="text-muted mb-0" style="font-size:13px;">
+                Container No: {{ $inspection->receiving->container_no ?? '-' }}
+                &nbsp;|&nbsp;
                 Receiving: {{ $inspection->receiving->receiving_no }}
                 &nbsp;|&nbsp;
                 Model: {{ $inspection->receiving->ckdModel->code }}

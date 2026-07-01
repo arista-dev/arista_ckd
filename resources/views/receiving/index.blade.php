@@ -7,9 +7,19 @@
             <h5 class="fw-bold mb-1">Receiving</h5>
             <p class="text-muted mb-0" style="font-size:13px;">Daftar penerimaan CKD Kit</p>
         </div>
-        <a href="{{ route('receiving.create') }}" class="btn btn-dark">
-            <i class="bi bi-plus-lg me-1"></i> Add Receiving
-        </a>
+        <div class="d-flex gap-2 align-items-center">
+            <form method="GET" action="{{ route('receiving.index') }}" id="searchForm">
+                <div class="input-group input-group-sm" style="width: 250px;">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" id="searchComponent" class="form-control border-start-0 ps-0"
+                        placeholder="Cari Container/Receiving..." value="{{ request('search') }}">
+                </div>
+            </form>
+            <a href="{{ route('receiving.create') }}" class="btn btn-dark">
+                <i class="bi bi-plus-lg me-1"></i> Add Receiving
+            </a>
+        </div>
+
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -18,7 +28,6 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th style="font-size:12px;" class="px-4">#</th>
                             <th style="font-size:12px;">Receiving No</th>
                             <th style="font-size:12px;">Container No</th>
                             <th style="font-size:12px;">Model</th>
@@ -29,11 +38,10 @@
                     <tbody>
                         @forelse($receivings as $i => $rcv)
                             <tr>
-                                <td class="px-4 text-muted" style="font-size:13px;">{{ $i + 1 }}</td>
                                 <td class="fw-semibold" style="font-size:13px;">{{ $rcv['receiving_no'] }}</td>
                                 <td style="font-size:13px;">{{ $rcv['container_no'] }}</td>
                                 <td style="font-size:13px;">{{ $rcv['ckdModel']['code'] }}</td>
-                                <td style="font-size:13px;">{{ $rcv['receive_date'] }}</td>
+                                <td style="font-size:13px;">{{ $rcv['receive_date']->format('d M Y') }}</td>
                                 <td>
                                     <span class="badge badge-{{ $rcv['status'] }}">{{ $rcv['status'] }}</span>
                                 </td>
@@ -48,7 +56,17 @@
                         @endforelse
                     </tbody>
                 </table>
+                <div class="card-footer bg-white d-flex justify-content-center py-3">
+                    {{ $receivings->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>
+@endsection
+@section('scripts')
+    <script>
+        document.getElementById('searchComponent').addEventListener('input', function() {
+            document.getElementById('searchForm').submit();
+        });
+    </script>
 @endsection
