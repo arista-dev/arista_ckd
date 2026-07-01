@@ -18,7 +18,7 @@ class InspectionController extends Controller
 
         // Inspector only sees their own workload (OPEN / WAITING_APPROVAL)
         if (session('user.role') === 'inspector') {
-            $query->whereIn('status', [Inspection::STATUS_OPEN, Inspection::STATUS_WAITING_APPROVAL]);
+            $query->whereIn('inspections.status', [Inspection::STATUS_OPEN, Inspection::STATUS_WAITING_APPROVAL]);
         }
 
         $inspections =$query->when(request('search'), function ($query, $search) {
@@ -81,15 +81,15 @@ class InspectionController extends Controller
         $damageRemark = null;
         $damagePhoto = $item->damage_photo;
 
-        if ($status === InspectionItem::STATUS_DAMAGE) {
+        if ($status === InspectionItem::STATUS_DAMAGE || $status === InspectionItem::STATUS_SHORT) {
             $damageRemark = $validated['damage_remark'] ?? null;
 
-            if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
-                $file = $request->file('photo');
-                $filename = strtoupper($item->component_code) . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('public/damage', $filename);
-                $damagePhoto = $filename;
-            }
+            // if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
+            //     $file = $request->file('photo');
+            //     $filename = strtoupper($item->component_code) . '_' . time() . '.' . $file->getClientOriginalExtension();
+            //     $file->storeAs('public/damage', $filename);
+            //     $damagePhoto = $filename;
+            // }
         } else {
             $damageRemark = null;
             $damagePhoto = null;

@@ -3,8 +3,22 @@
 
 @section('content')
     <div class="mb-4">
-        <h5 class="fw-bold mb-1">Approval</h5>
-        <p class="text-muted mb-0" style="font-size:13px;">Inspection yang menunggu persetujuan</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="fw-bold mb-1">Approval</h5>
+                <p class="text-muted mb-0" style="font-size:13px;">
+                    Inspection yang menunggu persetujuan
+                </p>
+            </div>
+
+            <form method="GET" action="{{ route('approval.index') }}" id="searchForm">
+                <div class="input-group input-group-sm" style="width: 250px;">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" id="searchComponent" class="form-control border-start-0 ps-0"
+                        placeholder="Cari Container/Receiving..." value="{{ request('search') }}">
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -15,7 +29,7 @@
                         <tr>
                             <th style="font-size:12px;" class="px-4">#</th>
                             <th style="font-size:12px;">Inspection No</th>
-                            <th style="font-size:12px;">Receiving No</th>
+                            <th style="font-size:12px;">Container/Receiving No</th>
                             <th style="font-size:12px;">Model</th>
                             <th style="font-size:12px;">Inspector</th>
                             <th style="font-size:12px;">Inspected At</th>
@@ -29,7 +43,8 @@
                             <tr>
                                 <td class="px-4 text-muted" style="font-size:13px;">{{ $i + 1 }}</td>
                                 <td class="fw-semibold" style="font-size:13px;">{{ $ins['inspection_no'] }}</td>
-                                <td style="font-size:13px;">{{ $ins['receiving']['receiving_no'] }}</td>
+                                <td style="font-size:13px;">
+                                    {{ $ins['receiving']['container_no'] }}/{{ $ins['receiving']['receiving_no'] }}</td>
                                 <td style="font-size:13px;">{{ $ins['receiving']['ckdModel']['code'] }}</td>
                                 <td style="font-size:13px;">{{ $ins['inspector']['name'] }}</td>
                                 <td style="font-size:13px;">{{ $ins['inspected_at'] }}</td>
@@ -75,6 +90,9 @@
                         @endforelse
                     </tbody>
                 </table>
+                <div class="card-footer bg-white d-flex justify-content-center py-3">
+                    {{ $pending->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>
@@ -136,6 +154,9 @@
 @endsection
 @section('scripts')
     <script>
+        document.getElementById('searchComponent').addEventListener('input', function() {
+            document.getElementById('searchForm').submit();
+        });
         document.querySelectorAll('.btnApprove').forEach(btn => {
 
             btn.addEventListener('click', function() {

@@ -24,20 +24,18 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::where('username', $request->username)
-                    ->where('is_active', true)
-                    ->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        $user = User::where('username', $request->username)->where('is_active', true)->first();
+        if (!$user || $request->password !== $user->password) {
             return back()
                 ->withErrors(['login' => 'Tidak dapat login. Username atau password salah.'])
                 ->withInput(['username' => $request->username]);
-        }
+        } 
+            
 
         // Store essential user data in session (no raw password)
         session([
             'user' => [
-                'id'   => $user->id,
+                'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
                 'role' => $user->role,

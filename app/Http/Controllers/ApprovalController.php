@@ -11,11 +11,29 @@ class ApprovalController extends Controller
 {
     public function index()
     {
-        $pending = Inspection::with(['receiving.ckdModel', 'inspector', 'items'])
-            ->latest('inspected_at')
-            ->get();
+        $query = Inspection::query()
+            ->select('inspections.*')
+            ->join('receivings', 'receivings.id', '=', 'inspections.receiving_id')
+            ->with(['receiving.ckdModel', 'inspector']);
 
-        
+        // Inspector only sees their own workload (OPEN / WAITING_APPROVAL)
+        if (session('user.role') === 'inspector') {
+            $query->whereIn('inspections.status', [Inspection::STATUS_OPEN, Inspection::STATUS_WAITING_APPROVAL]);
+        }
+
+        $pending = $query
+            ->when(request('search'), function ($query, $search) {
+                $search = strtolower($search);
+                $query->whereHas('receiving', function ($q) use ($search) {
+                    $q->whereRaw('LOWER(container_no) LIKE ?', ["%{$search}%"])->orWhereRaw('LOWER(receiving_no) LIKE ?', ["%{$search}%"]);
+                });
+            })
+            ->orderByDesc('inspections.created_at')
+            ->orderByDesc('receivings.container_no')
+            ->paginate(10)
+            ->withQueryString();
+
+
         // dd($pending);
         return view('approval.index', compact('pending'));
     }
@@ -37,7 +55,7 @@ class ApprovalController extends Controller
         DB::transaction(function () use ($request, $inspection) {
             if ($request->action === 'approve') {
                 $inspection->update([
-                    'vin'         => strtoupper($request->vin),
+                    'vin' => strtoupper($request->vin),
                     'status' => Inspection::STATUS_CLOSED,
                     'approved_by' => session('user.id'),
                     'approved_at' => now(),

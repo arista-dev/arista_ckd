@@ -57,7 +57,7 @@
                                 <th style="font-size:12px;" class="text-center">Actual Qty</th>
                                 <th style="font-size:12px;" class="text-center">Short Qty</th>
                                 <th style="font-size:12px;" class="text-center">Status</th>
-                                <th style="font-size:12px;">Damage Info</th>
+                                <th style="font-size:12px;">Remarks</th>
                                 @if (!$inspection->isClosed())
                                     <th style="font-size:12px;" class="text-center" width="70">Action</th>
                                 @endif
@@ -112,7 +112,7 @@
 
                                     <td style="min-width:220px;">
                                         @if ($inspection->isClosed())
-                                            @if ($item->isDamage())
+                                            @if ($item->isDamage() || $item->isShort())
                                                 <small class="text-muted d-block">{{ $item->damage_remark ?? '-' }}</small>
                                                 @if ($item->hasDamagePhoto())
                                                     <a href="{{ $item->damagePhotoUrl() }}" target="_blank"
@@ -125,27 +125,21 @@
                                             @endif
                                         @else
                                             <div class="field-damage-wrap"
-                                                style="{{ $item->isDamage() ? '' : 'display:none;' }}">
+                                                style="{{ $item->isDamage() || $item->isShort() ? '' : 'display:none;' }}">
                                                 <input type="text"
                                                     class="form-control form-control-sm mb-1 field-damage-remark"
-                                                    placeholder="Damage remark..."
-                                                    value="{{ $item->damage_remark ?? '' }}">
-                                                <input type="file"
-                                                    class="form-control form-control-sm field-damage-photo"
-                                                    accept="image/*">
-                                                @if ($item->hasDamagePhoto())
-                                                    <small class="text-success mt-1 d-block">
-                                                        <i class="bi bi-check-circle"></i> Foto: {{ $item->damage_photo }}
-                                                    </small>
-                                                @endif
+                                                    placeholder="Remarks Info.." value="{{ $item->damage_remark ?? '' }}">
+
                                             </div>
                                         @endif
                                     </td>
 
                                     @if (!$inspection->isClosed())
                                         <td class="text-center">
-                                            <button type="button" class="btn btn-sm btn-outline-success save-item"
-                                                title="Simpan">
+                                            <button type="button"
+                                                class="btn btn-sm {{ $inspection->status == 'WAITING_APPROVAL' ? 'btn-outline-grey' : 'btn-outline-success' }} save-item"
+                                                title="Simpan"
+                                                {{ $inspection->status == 'WAITING_APPROVAL' ? 'disabled' : '' }}>
                                                 <i class="bi bi-check-lg save-icon"></i>
                                             </button>
                                         </td>
@@ -268,7 +262,7 @@
         });
 
         function toggleDamage(div, status) {
-            if (div) div.style.display = (status === 'DAMAGE') ? '' : 'none';
+            if (div) div.style.display = (status === 'DAMAGE') || (status === 'SHORT') ? '' : 'none';
         }
         // document.querySelectorAll('.actual-qty').forEach(function(input) {
         //     input.addEventListener('input', function() {

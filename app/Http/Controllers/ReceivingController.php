@@ -82,7 +82,7 @@ class ReceivingController extends Controller
                         'component_code' => $component->code,
                         'component_name' => $component->name,
                         'expected_qty' => $component->expected_qty,
-                        'actual_qty' => null,
+                        'actual_qty' => $component->expected_qty,
                         'short_qty' => 0,
                         'status' => InspectionItem::STATUS_OK,
                         'created_at' => $now,
