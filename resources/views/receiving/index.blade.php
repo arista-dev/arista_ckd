@@ -65,8 +65,14 @@
 @endsection
 @section('scripts')
     <script>
+        let searchTimeout;
+
         document.getElementById('searchComponent').addEventListener('input', function() {
-            document.getElementById('searchForm').submit();
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                document.getElementById('searchForm').submit();
+            }, 1500); // Wait 1500ms after the last keystroke
         });
     </script>
 @endsection

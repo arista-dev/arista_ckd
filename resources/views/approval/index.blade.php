@@ -61,20 +61,17 @@
                                             class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        @if ($ins['status'] != 'CLOSED')
+                                        @if ($ins['status'] == 'WAITING_APPROVAL')
                                             <button class="btn btn-sm btn-success btnApprove" data-id="{{ $ins['id'] }}"
                                                 data-no="{{ $ins['inspection_no'] }}" data-bs-toggle="modal"
                                                 data-bs-target="#approveModal">
                                                 <i class="bi bi-check-lg"></i> Approve
                                             </button>
-                                            <form method="POST" action="{{ route('approval.action', $ins['id']) }}"
-                                                onsubmit="return confirm('Reject inspection ini? Akan dikembalikan ke Inspector.')">
-                                                @csrf
-                                                <input type="hidden" name="action" value="reject">
-                                                <button class="btn btn-sm btn-danger">
-                                                    <i class="bi bi-x-lg"></i> Reject
-                                                </button>
-                                            </form>
+                                            <button class="btn btn-sm btn-danger btnReject" data-id="{{ $ins['id'] }}"
+                                                data-no="{{ $ins['inspection_no'] }}" data-bs-toggle="modal"
+                                                data-bs-target="#rejectModal">
+                                                <i class="bi bi-x-lg"></i> Reject
+                                            </button>
                                         @endif
                                     </div>
 
@@ -96,66 +93,19 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="approveModal" tabindex="-1">
-        <div class="modal-dialog">
-            <form method="POST" id="approveForm">
-                @csrf
-
-                <input type="hidden" name="action" value="approve">
-
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            Approve Inspection
-                        </h5>
-
-                        <button class="btn-close" data-bs-dismiss="modal">
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-
-                        <div class="mb-3">
-                            <label class="form-label">
-                                Inspection No
-                            </label>
-
-                            <input class="form-control" id="inspectionNo" readonly>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">
-                                VIN
-                            </label>
-
-                            <input type="text" name="vin" class="form-control" required maxlength="17"
-                                placeholder="Input VIN">
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer">
-
-                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
-                            Cancel
-                        </button>
-
-                        <button class="btn btn-success">
-                            Approve
-                        </button>
-
-                    </div>
-
-                </div>
-            </form>
-        </div>
-    </div>
+    @include('approval.modal.approval')
+    @include('approval.modal.reject')
 @endsection
 @section('scripts')
     <script>
+        let searchTimeout;
+
         document.getElementById('searchComponent').addEventListener('input', function() {
-            document.getElementById('searchForm').submit();
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                document.getElementById('searchForm').submit();
+            }, 1500); // Wait 1500ms after the last keystroke
         });
         document.querySelectorAll('.btnApprove').forEach(btn => {
 
@@ -170,6 +120,20 @@
                     "{{ url('approval') }}/" + id;
             });
 
+        });
+        document.querySelectorAll('.btnReject').forEach(btn => {
+            btn.addEventListener('click', function() {
+
+                const id = this.dataset.id;
+                const no = this.dataset.no;
+
+
+                document.getElementById('rejectModalTitle').textContent =
+                    'Reject Inspection - ' + no;
+
+                document.getElementById('rejectForm').action =
+                    "{{ url('approval') }}/" + id;
+            });
         });
     </script>
 @endsection

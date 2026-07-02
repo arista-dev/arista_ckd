@@ -124,6 +124,9 @@ class InspectionController extends Controller
         if ($action === 'submit') {
             $inspection->update(['status' => Inspection::STATUS_WAITING_APPROVAL]);
         }
+        if ($action === 'cancel') {
+            $inspection->update(['status' => Inspection::STATUS_OPEN]);
+        }
 
         $msg = $action === 'submit' ? 'Inspection berhasil disubmit, menunggu approval Supervisor.' : 'Inspection berhasil disimpan sebagai draft.';
 

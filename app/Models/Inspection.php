@@ -34,6 +34,7 @@ class Inspection extends Model
     const STATUS_OPEN             = 'OPEN';
     const STATUS_WAITING_APPROVAL = 'WAITING_APPROVAL';
     const STATUS_CLOSED           = 'CLOSED';
+    const STATUS_CANCEL           = 'CANCELLED';
 
     // ─── Relationships ────────────────────────────────────────────────────────
 

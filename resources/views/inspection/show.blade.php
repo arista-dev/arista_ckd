@@ -46,6 +46,7 @@
             </form>
         </div>
         <form method="POST" action="{{ route('inspection.update', $inspection->id) }}" id="inspectionForm">
+            <input type="hidden" name="action" id="formAction" value="save">
             @csrf
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -156,14 +157,31 @@
     </div>
 
     {{-- Action Buttons --}}
-    @if (!$inspection->isClosed())
+    @if ($inspection->isOpen())
         <div class="d-flex gap-2">
-            <button type="submit" name="action" value="submit" class="btn btn-success px-4"
-                onclick="return confirm('Submit inspection untuk approval?\nPastikan semua data sudah benar.')">
+            <button type="button" name="action" class="btn btn-success px-4" data-bs-toggle="modal"
+                data-bs-target="#submitApprovalModal">
                 <i class="bi bi-send me-1"></i> Submit for Approval
             </button>
+            {{-- <button type="submit" name="action" value="submit" class="btn btn-success px-4"
+                onclick="return confirm('Submit inspection untuk approval?\nPastikan semua data sudah benar.')">
+                <i class="bi bi-send me-1"></i> Submit for Approval
+            </button> --}}
         </div>
-    @else
+    @endif
+    @if ($inspection->isWaitingApproval())
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary px-4" data-bs-toggle="modal"
+                data-bs-target="#cancelApprovalModal">
+                <i class="bi bi-x-circle me-1"></i> Cancel Approval
+            </button>
+            {{-- <button type="submit" name="action" value="submit" class="btn btn-success px-4"
+                onclick="return confirm('Submit inspection untuk approval?\nPastikan semua data sudah benar.')">
+                <i class="bi bi-send me-1"></i> Submit for Approval
+            </button> --}}
+        </div>
+    @endif
+    @if ($inspection->isClosed())
         <div class="alert alert-success">
             <i class="bi bi-check-circle me-2"></i>
             Inspection ini sudah <strong>CLOSED</strong>.
@@ -173,7 +191,8 @@
     @endif
     </form>
 @endsection
-
+@include('inspection.modal.submit_approval')
+@include('inspection.modal.cancel_approval')
 @section('scripts')
     <script>
         const inspectionId = {{ $inspection->id }};
@@ -184,7 +203,7 @@
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 clearTimeout(searchTimer);
-                searchTimer = setTimeout(() => document.getElementById('searchForm').submit(), 400);
+                searchTimer = setTimeout(() => document.getElementById('searchForm').submit(), 1500);
             });
         }
 
@@ -264,44 +283,14 @@
         function toggleDamage(div, status) {
             if (div) div.style.display = (status === 'DAMAGE') || (status === 'SHORT') ? '' : 'none';
         }
-        // document.querySelectorAll('.actual-qty').forEach(function(input) {
-        //     input.addEventListener('input', function() {
-        //         const code = this.dataset.code;
-        //         const expected = parseInt(this.dataset.expected);
-        //         const actual = parseInt(this.value) || 0;
-        //         const short = Math.max(0, expected - actual);
 
-        //         // Update short qty display
-        //         const shortCell = document.getElementById('short-' + code);
-        //         if (shortCell) {
-        //             shortCell.innerHTML = short > 0 ?
-        //                 '<span class="text-warning fw-bold">' + short + '</span>' :
-        //                 '<span class="text-muted">0</span>';
-        //         }
-
-        //         // Auto-set status to SHORT if actual < expected
-        //         const statusSel = document.getElementById('status-' + code);
-        //         if (!statusSel) return;
-
-        //         if (actual < expected) {
-        //             statusSel.value = 'SHORT';
-        //             toggleDamage(code, 'SHORT');
-        //         } else if (statusSel.value === 'SHORT' && actual >= expected) {
-        //             statusSel.value = 'OK';
-        //             toggleDamage(code, 'OK');
-        //         }
-        //     });
-        // });
-
-        // document.querySelectorAll('.status-select').forEach(function(sel) {
-        //     sel.addEventListener('change', function() {
-        //         toggleDamage(this.dataset.code, this.value);
-        //     });
-        // });
-
-        // function toggleDamage(code, status) {
-        //     const div = document.getElementById('damage-' + code);
-        //     if (div) div.style.display = (status === 'DAMAGE') ? '' : 'none';
-        // }
+        document.getElementById('btnSubmitApproval').addEventListener('click', function() {
+            document.getElementById('formAction').value = 'submit';
+            document.getElementById('inspectionForm').submit();
+        });
+        document.getElementById('btnCancelApproval').addEventListener('click', function() {
+            document.getElementById('formAction').value = 'cancel';
+            document.getElementById('inspectionForm').submit();
+        });
     </script>
 @endsection

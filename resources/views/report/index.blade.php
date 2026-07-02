@@ -2,41 +2,26 @@
 @section('page-title', 'Report')
 
 @section('content')
-    <div class="mb-4">
-        <h5 class="fw-bold mb-1">Inspection Report</h5>
-        <p class="text-muted mb-0" style="font-size:13px;">Laporan hasil pemeriksaan CKD Kit</p>
-    </div>
+    <div class="card-header d-flex justify-content-between align-items-center mb-4">
+        <div class="py-3 d-flex justify-content-between align-items-center w-100">
+            <div>
+                <h5 class="fw-bold mb-1">Inspection Report</h5>
+                <p class="text-muted mb-0" style="font-size:13px;">
+                    Laporan hasil pemeriksaan CKD Kit
+                </p>
+            </div>
 
-    {{-- Filter Form --}}
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <form method="GET" action="{{ route('report.index') }}" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold" style="font-size:13px;">Date From</label>
-                    <input type="date" name="date_from" class="form-control form-control-sm" value="{{ $dateFrom }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold" style="font-size:13px;">Date To</label>
-                    <input type="date" name="date_to" class="form-control form-control-sm" value="{{ $dateTo }}">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold" style="font-size:13px;">Model</label>
-                    <select name="ckd_model_id" class="form-select form-select-sm">
-                        <option value="">— All Models —</option>
-                        @foreach ($models as $m)
-                            <option value="{{ $m->id }}" {{ $modelId == $m->id ? 'selected' : '' }}>
-                                {{ $m->code }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-dark btn-sm px-3">
-                        <i class="bi bi-funnel me-1"></i> Filter
-                    </button>
-                    <a href="{{ route('report.index') }}" class="btn btn-outline-secondary btn-sm px-3">
-                        <i class="bi bi-x-lg"></i> Reset
-                    </a>
+            <form method="GET" action="{{ route('report.index') }}" id="searchForm">
+                <input type="hidden" name="date_from" value="{{ $dateFrom }}">
+                <input type="hidden" name="date_to" value="{{ $dateTo }}">
+                <input type="hidden" name="ckd_model_id" value="{{ $modelId }}">
+
+                <div class="input-group input-group-sm" style="width:250px;">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="search" id="searchComponent" class="form-control border-start-0 ps-0"
+                        placeholder="Inspection / Receiving / Component..." value="{{ request('search') }}">
                 </div>
             </form>
         </div>
@@ -45,11 +30,20 @@
     {{-- Export Button --}}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <span class="text-muted" style="font-size:13px;">
-            Total: <strong>{{ count($items) }}</strong> baris
+            Total: <strong>{{ $items->total() }}</strong> baris
         </span>
-        <a href="{{ route('report.export', array_filter(['date_from' => $dateFrom, 'date_to' => $dateTo, 'ckd_model_id' => $modelId])) }}"
+        <a href="{{ route(
+            'report.export',
+            array_filter([
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'ckd_model_id' => $modelId,
+                'search' => request('search'),
+            ]),
+        ) }}"
             class="btn btn-success btn-sm px-3">
-            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export CSV
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+            Export CSV
         </a>
     </div>
 
@@ -98,7 +92,30 @@
                         @endforelse
                     </tbody>
                 </table>
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3 px-3">
+                    <small class="text-muted">
+                        Showing {{ $items->firstItem() ?? 0 }}
+                        -
+                        {{ $items->lastItem() ?? 0 }}
+                        of {{ $items->total() }} records
+                    </small>
+
+                    {{ $items->links('pagination::bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>
+@endsection
+@section('scripts')
+    <script>
+        let searchTimeout;
+
+        document.getElementById('searchComponent').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                document.getElementById('searchForm').submit();
+            }, 1500);
+        });
+    </script>
 @endsection
