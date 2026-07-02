@@ -14,7 +14,8 @@ class ApprovalController extends Controller
         $query = Inspection::query()
             ->select('inspections.*')
             ->join('receivings', 'receivings.id', '=', 'inspections.receiving_id')
-            ->with(['receiving.ckdModel', 'inspector']);
+            ->with(['receiving.ckdModel', 'inspector'])
+            ->where('receivings.deleted', false);
 
         // Inspector only sees their own workload (OPEN / WAITING_APPROVAL)
         if (session('user.role') === 'inspector') {

@@ -35,7 +35,8 @@ class CkdModel extends Model
 
     public function receivings(): HasMany
     {
-        return $this->hasMany(Receiving::class, 'ckd_model_id');
+        return $this->hasMany(Receiving::class, 'ckd_model_id')
+                ->where('deleted', false);
     }
 
     // ─── Scopes ───────────────────────────────────────────────────────────────

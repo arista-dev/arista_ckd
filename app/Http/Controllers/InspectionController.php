@@ -14,6 +14,7 @@ class InspectionController extends Controller
         $query = Inspection::query()
     ->select('inspections.*')
     ->join('receivings', 'receivings.id', '=', 'inspections.receiving_id')
+    ->where('receivings.deleted', false)
     ->with(['receiving.ckdModel', 'inspector']);
 
         // Inspector only sees their own workload (OPEN / WAITING_APPROVAL)

@@ -18,8 +18,12 @@ class ReportController extends Controller
         $search = $request->input('search');
 
         $items = $this->buildQuery($dateFrom, $dateTo, $modelId)
-            ->when($search, function ($query) use ($search) {
+    ->whereHas('inspection.receiving', function ($q) {
+        $q->where('deleted', false);
+    })
+    ->when($search, function ($query) use ($search) {
                 $search = strtolower(trim($search));
+
 
                 $query->where(function ($q) use ($search) {
                     $q->whereRaw('LOWER(component_name) LIKE ?', ["%{$search}%"])
