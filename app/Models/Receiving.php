@@ -8,25 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Receiving extends Model
 {
-    protected $fillable = [
-        'receiving_no',
-        'container_no',
-        'ckd_model_id',
-        'receive_date',
-        'status',
-        'created_by',
-        'notes',
-    ];
+    protected $fillable = ['receiving_no', 'container_no', 'ckd_model_id', 'receive_date', 'status', 'created_by', 'notes', 'deleted'];
 
     protected $casts = [
         'receive_date' => 'date',
+        'deleted' => 'boolean',
     ];
 
     // ─── Status constants ─────────────────────────────────────────────────────
 
-    const STATUS_RECEIVED         = 'RECEIVED';
-    const STATUS_INSPECTION_OPEN  = 'INSPECTION_OPEN';
-    const STATUS_CLOSED           = 'CLOSED';
+    const STATUS_RECEIVED = 'RECEIVED';
+    const STATUS_INSPECTION_OPEN = 'INSPECTION_OPEN';
+    const STATUS_CLOSED = 'CLOSED';
 
     // ─── Relationships ────────────────────────────────────────────────────────
 
@@ -74,14 +67,19 @@ class Receiving extends Model
      */
     public static function generateNo(): string
     {
-        $today    = now()->format('Ymd');
-        $prefix   = "RCV-{$today}-";
-        $lastNo   = static::where('receiving_no', 'like', $prefix . '%')
-                          ->orderByDesc('receiving_no')
-                          ->value('receiving_no');
+        $today = now()->format('Ymd');
+        $prefix = "RCV-{$today}-";
+        $lastNo = static::where('receiving_no', 'like', $prefix . '%')
+            ->orderByDesc('receiving_no')
+            ->value('receiving_no');
 
         $seq = $lastNo ? ((int) substr($lastNo, -3)) + 1 : 1;
 
         return $prefix . str_pad($seq, 3, '0', STR_PAD_LEFT);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('deleted', false);
     }
 }

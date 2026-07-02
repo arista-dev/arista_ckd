@@ -11,26 +11,21 @@ use App\Models\InspectionItem;
 
 class ReceivingController extends Controller
 {
-   public function index(Request $request)
+    public function index(Request $request)
     {
-        $query = Receiving::with(['ckdModel', 'createdBy'])
+        $query = Receiving::active()
+            ->with(['ckdModel', 'createdBy'])
             ->latest();
 
         if ($request->filled('search')) {
             $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
-                $q->where('container_no', 'like', "%{$search}%")
-                ->orWhere('receiving_no', 'like', "%{$search}%");
+                $q->where('container_no', 'like', "%{$search}%")->orWhere('receiving_no', 'like', "%{$search}%");
             });
         }
 
-        $receivings = $query
-            ->orderByDesc('created_at')
-            ->orderByDesc('container_no')
-            ->paginate(10)
-            ->withQueryString();
-        
+        $receivings = $query->orderByDesc('created_at')->orderByDesc('container_no')->paginate(10)->withQueryString();
 
         return view('receiving.index', compact('receivings'));
     }
@@ -58,7 +53,7 @@ class ReceivingController extends Controller
             for ($i = 0; $i < $request->total_receiving; $i++) {
                 $receiving = Receiving::create([
                     'receiving_no' => Receiving::generateNo(),
-                  'container_no' => $request->container_no . '-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
+                    'container_no' => $request->container_no . '-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
                     'ckd_model_id' => $model->id,
                     'receive_date' => $now,
                     'status' => Receiving::STATUS_INSPECTION_OPEN,
@@ -97,5 +92,18 @@ class ReceivingController extends Controller
         });
 
         return redirect()->route('receiving.index');
+    }
+
+    public function destroy(Receiving $receiving)
+    {
+        if ($receiving->deleted) {
+            return back()->with('error', 'Receiving already deleted.');
+        }
+
+        $receiving->update([
+            'deleted' => true,
+        ]);
+
+        return redirect()->route('receiving.index')->with('success', 'Receiving berhasil dihapus.');
     }
 }

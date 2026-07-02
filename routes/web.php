@@ -34,6 +34,8 @@ Route::middleware('auth.ckd')->group(function () {
         Route::get('/receiving', [ReceivingController::class, 'index'])->name('receiving.index');
         Route::get('/receiving/create', [ReceivingController::class, 'create'])->name('receiving.create');
         Route::post('/receiving', [ReceivingController::class, 'store'])->name('receiving.store');
+        Route::post('/receiving/{receiving}/delete', [ReceivingController::class, 'destroy'])
+        ->name('receiving.destroy');
     });
 
     // ── Inspection — Admin & Inspector ────────────────────────────────────────

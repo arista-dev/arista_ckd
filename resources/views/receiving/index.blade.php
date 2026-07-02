@@ -33,6 +33,7 @@
                             <th style="font-size:12px;">Model</th>
                             <th style="font-size:12px;">Receive Date</th>
                             <th style="font-size:12px;">Status</th>
+                            <th style="font-size:12px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,6 +45,18 @@
                                 <td style="font-size:13px;">{{ $rcv['receive_date']->format('d M Y') }}</td>
                                 <td>
                                     <span class="badge badge-{{ $rcv['status'] }}">{{ $rcv['status'] }}</span>
+                                </td>
+                                <td>
+
+                                    <button
+                                        class="btn btn-sm    {{ $rcv->status === 'INSPECTION_OPEN' ? 'btn-outline-danger' : 'btn-outline-secondary' }} btnDelete"
+                                        data-id="{{ $rcv->id }}" data-receiving="{{ $rcv->receiving_no }}"
+                                        data-container="{{ $rcv->container_no }}" data-model="{{ $rcv->ckdModel->code }}"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                        {{ $rcv->status === 'INSPECTION_OPEN' ? '' : 'disabled' }}>
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+
                                 </td>
                             </tr>
                         @empty
@@ -61,6 +74,8 @@
                 </div>
             </div>
         </div>
+
+        @include('receiving.modal.delete')
     </div>
 @endsection
 @section('scripts')
@@ -73,6 +88,28 @@
             searchTimeout = setTimeout(() => {
                 document.getElementById('searchForm').submit();
             }, 1500); // Wait 1500ms after the last keystroke
+        });
+
+        document.querySelectorAll('.btnDelete').forEach(btn => {
+
+            btn.addEventListener('click', function() {
+
+                const id = this.dataset.id;
+                const receiving = this.dataset.receiving;
+                const container = this.dataset.container;
+                const model = this.dataset.model;
+
+                document.getElementById('deleteModalTitle').textContent =
+                    'Hapus Receiving ' + receiving;
+
+                document.getElementById('deleteReceivingNo').textContent = receiving;
+                document.getElementById('deleteContainerNo').textContent = container;
+                document.getElementById('deleteModel').textContent = model;
+
+                document.getElementById('deleteForm').action =
+                    "{{ url('receiving') }}/" + id + "/delete";
+            });
+
         });
     </script>
 @endsection
